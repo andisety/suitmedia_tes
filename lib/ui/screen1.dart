@@ -105,7 +105,7 @@ class _FirstScreenState extends State<FirstScreen> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => SecondScreen()));
+                              builder: (context) => const SecondScreen()));
                     }),
               ],
             ),

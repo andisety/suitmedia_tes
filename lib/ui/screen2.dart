@@ -11,12 +11,17 @@ class SecondScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String name = data?.firstName ?? "";
+    String firstName = data?.firstName ?? "";
+    String lastName = data?.lastName ?? "";
+    String join = (data?.firstName != null)
+        ? "$firstName $lastName"
+        : "Selected User Name";
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text("Second Screen"),
         centerTitle: true,
@@ -33,11 +38,11 @@ class SecondScreen extends StatelessWidget {
         child:
             Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           const Text("Welcome"),
-          Text(name),
-          const Expanded(
+          Text("$firstName $lastName"),
+          Expanded(
             child: Center(
               child: Text(
-                "Selected User Name",
+                join,
                 style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24.0),
               ),
             ),

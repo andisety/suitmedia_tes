@@ -12,7 +12,7 @@ class ThirdScreen extends StatefulWidget {
 }
 
 class _ThirdScreenState extends State<ThirdScreen> {
-  Dio _dio = Dio();
+  final Dio _dio = Dio();
   List<Datum> _dataList = [];
   int _currentPage = 1;
 
