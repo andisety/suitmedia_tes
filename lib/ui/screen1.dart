@@ -10,6 +10,9 @@ class FirstScreen extends StatefulWidget {
 }
 
 class _FirstScreenState extends State<FirstScreen> {
+  TextEditingController nameController = TextEditingController();
+  TextEditingController sentenceController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,15 +39,20 @@ class _FirstScreenState extends State<FirstScreen> {
                 SizedBox(
                   width: 310,
                   height: 40,
-                  child: TextFormField(
-                    decoration: InputDecoration(
-                      hintText: 'Name',
-                      fillColor: Colors.white,
-                      filled: true,
-                      border: OutlineInputBorder(
-                        borderSide:
-                            const BorderSide(color: Colors.white, width: 2.0),
-                        borderRadius: BorderRadius.circular(12.0),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextFormField(
+                        controller: nameController,
+                        decoration: const InputDecoration(
+                          hintText: 'Name',
+                          border: InputBorder.none,
+                        ),
                       ),
                     ),
                   ),
@@ -53,15 +61,20 @@ class _FirstScreenState extends State<FirstScreen> {
                 SizedBox(
                   width: 310,
                   height: 40,
-                  child: TextFormField(
-                    decoration: InputDecoration(
-                      hintText: 'Palindrome',
-                      fillColor: Colors.white,
-                      filled: true,
-                      border: OutlineInputBorder(
-                        borderSide:
-                            const BorderSide(color: Colors.white, width: 2.0),
-                        borderRadius: BorderRadius.circular(12.0),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextFormField(
+                        controller: sentenceController,
+                        decoration: const InputDecoration(
+                          hintText: 'Palindrome',
+                          border: InputBorder.none,
+                        ),
                       ),
                     ),
                   ),
@@ -83,7 +96,7 @@ class _FirstScreenState extends State<FirstScreen> {
                       ),
                     ),
                     onPressed: () {
-                      // _login();
+                      checkPalindrome();
                     }),
                 const SizedBox(height: 15.0),
                 CupertinoButton(
@@ -113,5 +126,44 @@ class _FirstScreenState extends State<FirstScreen> {
         ),
       ]),
     );
+  }
+
+  void checkPalindrome() {
+    String sentence = sentenceController.text.toLowerCase().replaceAll(' ', '');
+    String reversedSentence = sentence.split('').reversed.join('');
+
+    if (sentence == reversedSentence) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Palindrome'),
+            content: Text('The sentence is a palindrome.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Not Palindrome'),
+            content: Text('The sentence is not a palindrome.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 }
