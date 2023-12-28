@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:suitmedia_tes/ui/screen2.dart';
 
 import '../model/respons.dart';
 
@@ -11,50 +12,46 @@ class ThirdScreen extends StatefulWidget {
 }
 
 class _ThirdScreenState extends State<ThirdScreen> {
-  final Dio _dio = Dio();
-  late Future<ResponseApi> _futureData;
-  final ScrollController _scrollController = ScrollController();
-  final List<Datum> _dataList = [];
-
+  Dio _dio = Dio();
+  List<Datum> _dataList = [];
   int _currentPage = 1;
-  final int _totalPages = 1;
 
   @override
   void initState() {
     super.initState();
-    _futureData = fetchData(_currentPage);
-    _scrollController.addListener(_scrollListener);
+    _fetchData();
   }
 
-  Future<ResponseApi> fetchData(int page) async {
+  Future<void> _fetchData() async {
     try {
-      Response response =
-          await _dio.get('https://reqres.in/api/users?page=$page&per_page=10');
+      Response response = await _dio
+          .get('https://reqres.in/api/users?page=$_currentPage&per_page=10');
+
       ResponseApi responseData = ResponseApi.fromJson(response.data);
-      return responseData;
+
+      setState(() {
+        _dataList = responseData.data;
+        _currentPage = responseData.page + 1;
+      });
     } catch (error) {
       print('Error: $error');
-      rethrow;
     }
   }
 
-  void _scrollListener() {
-    if (_scrollController.offset >=
-            _scrollController.position.maxScrollExtent &&
-        !_scrollController.position.outOfRange) {
-      // User has reached the bottom of the list, load next page
-      if (_currentPage < _totalPages) {
+  Future<void> _loadMoreData() async {
+    try {
+      Response response = await _dio
+          .get('https://reqres.in/api/users?page=$_currentPage&per_page=10');
+
+      ResponseApi responseData = ResponseApi.fromJson(response.data);
+
+      setState(() {
+        _dataList.addAll(responseData.data);
         _currentPage++;
-        _futureData = fetchData(_currentPage);
-        setState(() {});
-      }
+      });
+    } catch (error) {
+      print('Error: $error');
     }
-  }
-
-  Future<void> _refreshData() async {
-    _currentPage = 1;
-    _futureData = fetchData(_currentPage);
-    setState(() {});
   }
 
   @override
@@ -75,43 +72,40 @@ class _ThirdScreenState extends State<ThirdScreen> {
           ),
         ),
       ),
-      body: Center(
-        child: FutureBuilder<ResponseApi>(
-          future: _futureData,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
-            } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else {
-              _dataList.addAll(snapshot.data!.data);
-              return RefreshIndicator(
-                onRefresh: _refreshData,
-                child: ListView.builder(
-                  controller: _scrollController,
-                  itemCount: _dataList.length,
-                  itemBuilder: (context, index) {
-                    Datum datum = _dataList[index];
-                    return ListTile(
-                      title: Text('${datum.firstName} ${datum.lastName}'),
-                      subtitle: Text(datum.email),
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(datum.avatar),
-                      ),
-                    );
-                  },
-                ),
-              );
-            }
+      body: NotificationListener<ScrollNotification>(
+        onNotification: (ScrollNotification scrollInfo) {
+          if (scrollInfo is ScrollEndNotification &&
+              scrollInfo.metrics.extentBefore == 0.0) {
+            _loadMoreData();
+          }
+          return false;
+        },
+        child: RefreshIndicator(
+          onRefresh: () async {
+            _currentPage = 1;
+            await _fetchData();
           },
+          child: ListView.builder(
+            itemCount: _dataList.length,
+            itemBuilder: (context, index) {
+              Datum datum = _dataList[index];
+              return ListTile(
+                title: Text('${datum.firstName} ${datum.lastName}'),
+                subtitle: Text(datum.email),
+                leading: CircleAvatar(
+                  backgroundImage: NetworkImage(datum.avatar),
+                ),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SecondScreen(data: datum)));
+                },
+              );
+            },
+          ),
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
   }
 }

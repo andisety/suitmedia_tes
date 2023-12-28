@@ -2,11 +2,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:suitmedia_tes/ui/screen3.dart';
 
+import '../model/respons.dart';
+
 class SecondScreen extends StatelessWidget {
-  const SecondScreen({super.key});
+  final Datum? data;
+
+  const SecondScreen({super.key, this.data});
 
   @override
   Widget build(BuildContext context) {
+    String name = data?.firstName ?? "";
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -28,7 +33,7 @@ class SecondScreen extends StatelessWidget {
         child:
             Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           const Text("Welcome"),
-          const Text("Name"),
+          Text(name),
           const Expanded(
             child: Center(
               child: Text(
