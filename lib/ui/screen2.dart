@@ -43,7 +43,7 @@ class SecondScreen extends StatelessWidget {
             child: Center(
               child: Text(
                 join,
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24.0),
+                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 24.0),
               ),
             ),
           ),

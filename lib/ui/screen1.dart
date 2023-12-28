@@ -137,12 +137,12 @@ class _FirstScreenState extends State<FirstScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Palindrome'),
-            content: Text('The sentence is a palindrome.'),
+            title: const Text('Palindrome'),
+            content: const Text('The sentence is a palindrome.'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text('OK'),
+                child: const Text('OK'),
               ),
             ],
           );
@@ -153,12 +153,12 @@ class _FirstScreenState extends State<FirstScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Not Palindrome'),
-            content: Text('The sentence is not a palindrome.'),
+            title: const Text('Not Palindrome'),
+            content: const Text('The sentence is not a palindrome.'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text('OK'),
+                child: const Text('OK'),
               ),
             ],
           );

@@ -26,28 +26,9 @@ class _ThirdScreenState extends State<ThirdScreen> {
     try {
       Response response = await _dio
           .get('https://reqres.in/api/users?page=$_currentPage&per_page=10');
-
       ResponseApi responseData = ResponseApi.fromJson(response.data);
-
       setState(() {
         _dataList = responseData.data;
-        _currentPage = responseData.page + 1;
-      });
-    } catch (error) {
-      print('Error: $error');
-    }
-  }
-
-  Future<void> _loadMoreData() async {
-    try {
-      Response response = await _dio
-          .get('https://reqres.in/api/users?page=$_currentPage&per_page=10');
-
-      ResponseApi responseData = ResponseApi.fromJson(response.data);
-
-      setState(() {
-        _dataList.addAll(responseData.data);
-        _currentPage++;
       });
     } catch (error) {
       print('Error: $error');
@@ -75,8 +56,9 @@ class _ThirdScreenState extends State<ThirdScreen> {
       body: NotificationListener<ScrollNotification>(
         onNotification: (ScrollNotification scrollInfo) {
           if (scrollInfo is ScrollEndNotification &&
-              scrollInfo.metrics.extentBefore == 0.0) {
-            _loadMoreData();
+              scrollInfo.metrics.extentAfter == 0.0) {
+            _currentPage++;
+            _fetchData();
           }
           return false;
         },
@@ -85,25 +67,52 @@ class _ThirdScreenState extends State<ThirdScreen> {
             _currentPage = 1;
             await _fetchData();
           },
-          child: ListView.builder(
-            itemCount: _dataList.length,
-            itemBuilder: (context, index) {
-              Datum datum = _dataList[index];
-              return ListTile(
-                title: Text('${datum.firstName} ${datum.lastName}'),
-                subtitle: Text(datum.email),
-                leading: CircleAvatar(
-                  backgroundImage: NetworkImage(datum.avatar),
+          child: _dataList.isEmpty
+              ? GestureDetector(
+                  onVerticalDragUpdate: (details) {
+                    int sensitivity = 1;
+                    if (details.delta.dy > sensitivity) {
+                      _currentPage = 1;
+                      _fetchData();
+                    } else if (details.delta.dy < sensitivity) {
+                      _currentPage++;
+                      _fetchData();
+                    }
+                  },
+                  child: Stack(
+                    children: [
+                      const Center(child: Text('Data kosong')),
+                      Center(
+                        child: Container(
+                          color: const Color.fromARGB(0, 255, 193, 7),
+                          width: double.infinity,
+                          height: double.infinity,
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  itemCount: _dataList.length,
+                  itemBuilder: (context, index) {
+                    Datum datum = _dataList[index];
+                    return ListTile(
+                      title: Text('${datum.firstName} ${datum.lastName}'),
+                      subtitle: Text(datum.email),
+                      leading: CircleAvatar(
+                        backgroundImage: NetworkImage(datum.avatar),
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SecondScreen(data: datum),
+                          ),
+                        );
+                      },
+                    );
+                  },
                 ),
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => SecondScreen(data: datum)));
-                },
-              );
-            },
-          ),
         ),
       ),
     );
